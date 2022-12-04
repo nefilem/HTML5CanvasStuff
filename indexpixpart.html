@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<body
+  style="position: fixed; left: 0px; right: 0px; top: 0px; bottom: 0px; overflow: hidden; margin: 0; padding: 0;">
+  <canvas id="canvas" style="width: 100%; height: 100%; padding: 0;margin: 0;"></canvas>
+  <script>
+    const canvas = document.getElementById("canvas");
+    const c = canvas.getContext("2d");
+
+    // size of canvas
+    const imgSize = 512;
+
+    canvas.width = imgSize;
+    canvas.height = imgSize;
+
+    // init image data with black pixels
+    const image = c.createImageData(imgSize, imgSize);
+    for (let i = 0; i < image.data.length; i += 4) {
+      image.data[i] = 0; // R
+      image.data[i + 1] = 0; // G
+      image.data[i + 2] = 0; // B
+      image.data[i + 3] = 255; // A
+    }
+    c.putImageData(image, 0, 0);
+  
+    const pixelParticle = c.createImageData(1,1);
+
+    const pixelRemove = c.createImageData(4, 4);
+    for (let i = 0; i < image.data.length; i += 4) {
+      image.data[i] = 0; // R
+      image.data[i + 1] = 0; // G
+      image.data[i + 2] = 0; // B
+      image.data[i + 3] = 255; // A
+    }
+
+    const getRandomInt = max => {
+      return Math.floor(Math.random() * max);
+    }
+
+    var arrParticles = [];
+    for (var a = 0; a < 100; a++) {
+      arrParticles[a] = new Array(getRandomInt(imgSize), getRandomInt(imgSize), getRandomInt(imgSize), getRandomInt(imgSize), getRandomInt(255), getRandomInt(255), getRandomInt(255), 0, 0);
+    }
+  
+    const moveParticles = () => {
+      for (let i = 0; i < 100; i++) {
+
+        arrParticles[i][7] = arrParticles[i][0];
+        arrParticles[i][8] = arrParticles[i][1];
+
+        if (arrParticles[i][0] > arrParticles[i][2]) { arrParticles[i][0] -= 1+Math.floor(Math.round((arrParticles[i][0] - arrParticles[i][2])/32)); }
+        if (arrParticles[i][0] < arrParticles[i][2]) { arrParticles[i][0] += 1+Math.floor(Math.round((arrParticles[i][2] - arrParticles[i][0])/32)); }
+        if (arrParticles[i][1] > arrParticles[i][3]) { arrParticles[i][1] -= 1+Math.floor(Math.round((arrParticles[i][1] - arrParticles[i][3])/32)); }
+        if (arrParticles[i][1] < arrParticles[i][3]) { arrParticles[i][1] += 1+Math.floor(Math.round((arrParticles[i][3] - arrParticles[i][1])/32)); }
+
+//console.log(arrParticles[i][0] + ', ' + arrParticles[i][2] + ' :: ' + arrParticles[i][1] + ', ' + arrParticles[i][3] + ' ***');
+
+        if (arrParticles[i][0] == arrParticles[i][2] && arrParticles[i][1] == arrParticles[i][3]) {
+          console.log("in");
+          arrParticles[i][2] = 1+getRandomInt(imgSize);
+          arrParticles[i][3] = 1+getRandomInt(imgSize);
+          arrParticles[i][4] = getRandomInt(255);
+          arrParticles[i][5] = getRandomInt(255);
+          arrParticles[i][6] = getRandomInt(255);
+        }
+
+        // console.log(arrParticles[1][0]);
+        //console.log(arrParticles[i][0] + ', ' + arrParticles[i][1] + ',' + arrParticles[i][2] + ', ' + arrParticles[i][3] + ' ::: ');
+        //image.data[((arrParticles[i][0] * arrParticles[i][1])*4)] = arrParticles[i][4]; 
+        //image.data[((arrParticles[i][0] * arrParticles[i][1])*4)+1] = arrParticles[i][5];
+        //image.data[((arrParticles[i][0] * arrParticles[i][1])*4)+2] = arrParticles[i][6];
+        //image.data[((arrParticles[i][0] * arrParticles[i][1])*4)+3] = 255;
+
+        pixelParticle.data[0] = arrParticles[i][4];
+        pixelParticle.data[1] = arrParticles[i][5];
+        pixelParticle.data[2] = arrParticles[i][6];
+        pixelParticle.data[3] = 255;
+
+        //c.putImageData(pixelRemove, arrParticles[i][7]-2, arrParticles[i][8]-2);
+        c.putImageData(pixelParticle, arrParticles[i][0]-1, arrParticles[i][1]-1);
+        c.putImageData(pixelParticle, arrParticles[i][0], arrParticles[i][1]-1);
+        c.putImageData(pixelParticle, arrParticles[i][0]+1, arrParticles[i][1]-1);
+        c.putImageData(pixelParticle, arrParticles[i][0]-1, arrParticles[i][1]);
+        c.putImageData(pixelParticle, arrParticles[i][0], arrParticles[i][1]);
+        c.putImageData(pixelParticle, arrParticles[i][0]+1, arrParticles[i][1]);
+        c.putImageData(pixelParticle, arrParticles[i][0]-1, arrParticles[i][1]+1);
+        c.putImageData(pixelParticle, arrParticles[i][0], arrParticles[i][1]+1);
+        c.putImageData(pixelParticle, arrParticles[i][0]+1, arrParticles[i][1]+1);
+
+
+
+      }
+      
+    }
+
+    const tick = time => {
+      c.putImageData(image, 0, 0);
+
+      moveParticles();
+
+      requestAnimationFrame(tick);
+
+      //console.log(time);
+    };
+
+    requestAnimationFrame(tick);
+  </script>
+</body>
